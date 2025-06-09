@@ -7,15 +7,17 @@ import { isEmpty } from "ramda";
 
 import ProductListItem from "./ProductListItem";
 
+import useDebounce from "../../hooks/useDebounce";
 import { Header } from "../commons";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchKey, setSearchKey] = useState("");
+  const debouncedSearchKey = useDebounce(searchKey);
   const fetchProducts = async () => {
     try {
-      const data = await productsApi.fetch({ searchTerm: searchKey });
+      const data = await productsApi.fetch({ searchTerm: debouncedSearchKey });
       setProducts(data.products);
     } catch (error) {
       console.log("error", error);
@@ -26,7 +28,7 @@ const ProductList = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [searchKey]);
+  }, [debouncedSearchKey]);
 
   if (isLoading) {
     return (

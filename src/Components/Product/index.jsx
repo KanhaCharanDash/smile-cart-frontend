@@ -8,6 +8,7 @@ import Carousel from "./Carousel";
 
 import productsApi from "../../apis/products";
 import { Header } from "../commons";
+import AddToCart from "../commons/AddToCard";
 import PageNotFound from "../commons/PageNotFound ";
 
 const Product = () => {
@@ -47,16 +48,6 @@ const Product = () => {
     <>
       <Header title={name} />
       <div className="px-6 pb-6">
-        <div>
-          {/* <LeftArrow
-            className="hover:neeto-ui-bg-gray-400 neeto-ui-rounded-full mr-6"
-            onClick={history.goBack}
-          /> */}
-          {/* <Typography className="py-2 text-4xl font-semibold" style="h1">
-            {name}
-          </Typography> */}
-          {/* <hr className="border-2 border-black" /> */}
-        </div>
         <div className="mt-6 flex gap-4">
           <div className="w-2/5">
             <div className="flex justify-center gap-16">
@@ -79,6 +70,7 @@ const Product = () => {
             <Typography className="font-semibold text-green-600">
               {discountPercentage}% off
             </Typography>
+            <AddToCart {...{ slug }} />
           </div>
         </div>
       </div>

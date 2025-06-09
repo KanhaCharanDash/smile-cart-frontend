@@ -1,25 +1,32 @@
-import { Spinner,Typography } from "neetoui";
-import productsApi from "apis/products";
 import { useEffect, useState } from "react";
 
+import productsApi from "apis/products";
+import { Search } from "neetoicons";
+import { Spinner, NoData, Input } from "neetoui";
+import { isEmpty } from "ramda";
+
 import ProductListItem from "./ProductListItem";
+
+import { Header } from "../commons";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchKey, setSearchKey] = useState("");
   const fetchProducts = async () => {
     try {
-      const { products } = await productsApi.fetch();
-      setProducts(products);
+      const data = await productsApi.fetch({ searchTerm: searchKey });
+      setProducts(data.products);
     } catch (error) {
-      console.log("An error occurred:", error);
+      console.log("error", error);
     } finally {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [searchKey]);
 
   if (isLoading) {
     return (
@@ -28,21 +35,31 @@ const ProductList = () => {
       </div>
     );
   }
+
   return (
-
-    <div className="flex flex-col">
-
-      <div className="m-2">
-        <Typography className="mx-6 mb-2 mt-6" style="h1" weight="semibold">
-          Smile Cart
-        </Typography>
-        <hr className="neeto-ui-bg-black h-1" />
-      </div>
-      <div className="grid grid-cols-2 justify-items-center gap-y-8 p-4 md:grid-cols-3 lg:grid-cols-4">
-        {products.map(product => (
-          <ProductListItem key={product.slug} {...product} />
-        ))}
-      </div>
+    <div className="flex h-screen flex-col">
+      <Header
+        shouldShowBackButton={false}
+        title="Smile cart"
+        actionBlock={
+          <Input
+            placeholder="Search products"
+            prefix={<Search />}
+            type="search"
+            value={searchKey}
+            onChange={event => setSearchKey(event.target.value)}
+          />
+        }
+      />
+      {isEmpty(products) ? (
+        <NoData className="h-full w-full" title="No products to show" />
+      ) : (
+        <div className="grid grid-cols-2 justify-items-center gap-y-8 p-4 md:grid-cols-3 lg:grid-cols-4">
+          {products.map(product => (
+            <ProductListItem key={product.slug} {...product} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -7,11 +7,11 @@ import { NoData, Toastr } from "neetoui";
 import { isEmpty, keys } from "ramda";
 import i18n from "src/common/i18n";
 import useCartItemsStore from "stores/useCartItemsStore";
-import withTitle from "utils/withTitle";
 
 import PriceCard from "./PriceCard";
 import ProductCard from "./ProductCard ";
 
+import withTitle from "../../utils/withTitle";
 import { PageLoader } from "../commons";
 import Header from "../commons/Header";
 import { MRP, OFFER_PRICE } from "../constants";
@@ -41,8 +41,6 @@ const Cart = () => {
       });
     } catch (error) {
       console.log("An error occurred:", error);
-    } finally {
-      // setIsLoading(false);
     }
   };
 

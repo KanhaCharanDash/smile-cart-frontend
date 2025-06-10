@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import productsApi from "apis/products";
-import i18n from "i18next";
+import { useFetchCartProducts } from "hooks/reactQuery/useProductsApi";
+import { t, i18n } from "i18next";
 import { NoData, Toastr } from "neetoui";
 import { isEmpty, keys } from "ramda";
 import useCartItemsStore from "stores/useCartItemsStore";
@@ -16,37 +17,31 @@ import { MRP, OFFER_PRICE } from "../constants";
 import { useCartTotalOf } from "../utils";
 
 const Cart = () => {
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { cartItems, setSelectedQuantity } = useCartItemsStore.pick();
-  const slugs = keys(cartItems);
-  const totalMrp = useCartTotalOf(products, MRP);
+  const slugs = useCartItemsStore(store => keys(store.cartItems));
+  const { data: products = [], isLoading } = useFetchCartProducts(slugs);
   const totalOfferPrice = useCartTotalOf(products, OFFER_PRICE);
+  const totalMrp = useCartTotalOf(products, MRP);
   const fetchCartProducts = async () => {
     try {
       const responses = await Promise.all(
         slugs.map(slug => productsApi.show(slug))
       );
 
-      setProducts(responses);
-
       responses.forEach(({ availableQuantity, name, slug }) => {
         if (availableQuantity >= cartItems[slug]) return;
 
         setSelectedQuantity(slug, availableQuantity);
         if (availableQuantity === 0) {
-          Toastr.error(
-            `${name} is no longer available and has been removed from cart`,
-            {
-              autoClose: 2000,
-            }
-          );
+          Toastr.error(t("product.error.removedFromCart", { name }), {
+            autoClose: 2000,
+          });
         }
       });
     } catch (error) {
       console.log("An error occurred:", error);
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 

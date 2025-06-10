@@ -1,4 +1,4 @@
-import useSelectedQuantity from "hooks/useSelectedQuantity ";
+import useSelectedQuantity from "hooks/useSelectedQuantity";
 import { Typography, Spinner, Button } from "neetoui";
 import { isNotNil } from "ramda";
 import { useParams } from "react-router-dom";

@@ -1,7 +1,7 @@
 import { useRef } from "react";
 
 import { useShowProduct } from "hooks/reactQuery/useProductsApi";
-import useSelectedQuantity from "hooks/useSelectedQuantity ";
+import useSelectedQuantity from "hooks/useSelectedQuantity";
 import { Button, Toastr, Input } from "neetoui";
 
 import TooltipWrapper from "./TooltipWrapper";

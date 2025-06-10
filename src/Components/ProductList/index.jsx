@@ -1,28 +1,55 @@
 import { useState } from "react";
 
 import { useFetchProducts } from "hooks/reactQuery/useProductsApi";
+import useFuncDebounce from "hooks/useFuncDebounce";
+import { filterNonNull } from "neetocist";
 import { Search } from "neetoicons";
 import { Spinner, NoData, Input, Pagination } from "neetoui";
-import { isEmpty } from "ramda";
+import { isEmpty, mergeLeft } from "ramda";
+import { useHistory } from "react-router-dom";
+import routes from "routes";
+import { buildUrl } from "utils/url";
 
 import { DEFAULT_PAGE_INDEX, DEFAULT_PAGE_SIZE } from "./constant";
 import ProductListItem from "./ProductListItem";
 
-import useDebounce from "../../hooks/useDebounce";
+import useQueryParams from "../../hooks/useQueryParams";
 import { Header } from "../commons";
 
 const ProductList = () => {
-  const [searchKey, setSearchKey] = useState("");
-  const debouncedSearchKey = useDebounce(searchKey);
-  const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE_INDEX);
+  const history = useHistory();
+  const queryParams = useQueryParams();
+  const { page, pageSize, searchTerm = "" } = queryParams;
+
+  const [searchKey, setSearchKey] = useState(searchTerm);
+
   const productsParams = {
-    searchTerm: debouncedSearchKey,
-    page: currentPage,
-    pageSize: DEFAULT_PAGE_SIZE,
+    searchTerm,
+    page: Number(page) || DEFAULT_PAGE_INDEX,
+    pageSize: Number(pageSize) || DEFAULT_PAGE_SIZE,
   };
+
+  const handlePageNavigation = page =>
+    history.replace(
+      buildUrl(
+        routes.products.index,
+        mergeLeft({ page, pageSize: DEFAULT_PAGE_SIZE }, queryParams)
+      )
+    );
 
   const { data: { products = [], totalProductsCount } = {}, isLoading } =
     useFetchProducts(productsParams);
+
+  const updateQueryParams = useFuncDebounce(value => {
+    const params = {
+      page: DEFAULT_PAGE_INDEX,
+      pageSize: DEFAULT_PAGE_SIZE,
+      searchTerm: value || null,
+    };
+
+    history.replace(buildUrl(routes.products.index, filterNonNull(params)));
+  });
+
   if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -42,9 +69,9 @@ const ProductList = () => {
             prefix={<Search />}
             type="search"
             value={searchKey}
-            onChange={event => {
-              setSearchKey(event.target.value);
-              setCurrentPage(DEFAULT_PAGE_INDEX);
+            onChange={({ target: { value } }) => {
+              updateQueryParams(value);
+              setSearchKey(value);
             }}
           />
         }
@@ -61,9 +88,9 @@ const ProductList = () => {
       <div className="mb-5 self-end">
         <Pagination
           count={totalProductsCount}
-          navigate={page => setCurrentPage(page)}
-          pageNo={currentPage || DEFAULT_PAGE_INDEX}
-          pageSize={DEFAULT_PAGE_SIZE}
+          navigate={handlePageNavigation}
+          pageNo={Number(page) || DEFAULT_PAGE_INDEX}
+          pageSize={Number(pageSize) || DEFAULT_PAGE_SIZE}
         />
       </div>
     </div>

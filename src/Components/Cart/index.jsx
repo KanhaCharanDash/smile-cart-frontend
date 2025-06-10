@@ -2,9 +2,10 @@ import { useEffect } from "react";
 
 import productsApi from "apis/products";
 import { useFetchCartProducts } from "hooks/reactQuery/useProductsApi";
-import { t, i18n } from "i18next";
+import { t } from "i18next";
 import { NoData, Toastr } from "neetoui";
 import { isEmpty, keys } from "ramda";
+import i18n from "src/common/i18n";
 import useCartItemsStore from "stores/useCartItemsStore";
 import withTitle from "utils/withTitle";
 

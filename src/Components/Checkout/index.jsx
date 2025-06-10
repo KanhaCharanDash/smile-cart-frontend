@@ -7,7 +7,10 @@ import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import withTitle from "utils/withTitle";
 
-import { CHECKOUT_FORM_INITIAL_VALUES } from "./constant";
+import {
+  CHECKOUT_FORM_INITIAL_VALUES,
+  CHECKOUT_FORM_VALIDATION_SCHEMA,
+} from "./constant";
 import Form from "./Form";
 
 import { PageLoader } from "../commons";
@@ -30,6 +33,7 @@ const Checkout = () => {
       formProps={{ noValidate: true }}
       formikProps={{
         initialValues: CHECKOUT_FORM_INITIAL_VALUES,
+        validationSchema: CHECKOUT_FORM_VALIDATION_SCHEMA,
       }}
     >
       <div className="flex space-x-4">

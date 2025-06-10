@@ -1,9 +1,45 @@
+import {
+  keysToCamelCase,
+  serializeKeysToSnakeCase,
+} from "@bigbinary/neeto-cist";
 import axios from "axios";
-import { keysToCamelCase, serializeKeysToSnakeCase } from "neetocist";
+import { t } from "i18next";
+import { Toastr } from "neetoui";
 import { evolve } from "ramda";
+
+const shouldShowToastr = response =>
+  typeof response === "object" && response?.noticeCode;
+
+const showSuccessToastr = response => {
+  if (shouldShowToastr(response.data)) Toastr.success(response.data);
+};
+
+const showErrorToastr = error => {
+  if (error.message === t("error.networkError")) {
+    Toastr.error(t("error.noInternetConnection"));
+  } else if (error.response?.status !== 404) {
+    Toastr.error(error);
+  }
+};
 
 const transformResponseKeysToCamelCase = response => {
   if (response.data) response.data = keysToCamelCase(response.data);
+};
+
+const responseInterceptors = () => {
+  axios.interceptors.response.use(
+    response => {
+      transformResponseKeysToCamelCase(response);
+      showSuccessToastr(response);
+
+      return response.data;
+    },
+    error => {
+      showErrorToastr(error);
+
+      return Promise.reject(error);
+    }
+  );
 };
 
 const requestInterceptors = () => {
@@ -12,25 +48,12 @@ const requestInterceptors = () => {
   );
 };
 
-const responseInterceptors = () => {
-  axios.interceptors.response.use(response => {
-    transformResponseKeysToCamelCase(response);
-
-    return response.data;
-  });
-};
-
-// Create a function to configure the default HTTP headers as follows.
 const setHttpHeaders = () => {
   axios.defaults.headers = {
     Accept: "application/json",
     "Content-Type": "application/json",
   };
 };
-// To avoid the repetition of specifying this URL in every request in the codebase, Axios provides a convenient feature that allows us to set a default baseURL, which can be achieved like this:
-
-// axios.defaults.baseURL =
-//   "https://smile-cart-backend-staging.neetodeployapp.com/";
 
 export default function initializeAxios() {
   axios.defaults.baseURL =

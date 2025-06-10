@@ -3,7 +3,9 @@ import { QUERY_KEYS } from "constants/query";
 import countriesApi from "apis/countries";
 import statesApi from "apis/states";
 import { prop } from "ramda";
-import { useQuery } from "react-query";
+import { useQuery, useMutation } from "react-query";
+
+import ordersApi from "../../apis/orders";
 
 export const useFetchCountries = () =>
   useQuery({
@@ -20,3 +22,4 @@ export const useFetchStates = stateParams =>
     select: prop("states"),
     staleTime: Infinity,
   });
+export const useCreateOrder = () => useMutation(ordersApi.create);

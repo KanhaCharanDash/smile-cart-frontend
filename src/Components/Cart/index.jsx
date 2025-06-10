@@ -11,15 +11,15 @@ import ProductCard from "./ProductCard ";
 import { PageLoader } from "../commons";
 import Header from "../commons/Header";
 import { MRP, OFFER_PRICE } from "../constants";
-import { cartTotalOf } from "../utils";
+import { useCartTotalOf } from "../utils";
 
 const Cart = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { cartItems, setSelectedQuantity } = useCartItemsStore.pick();
   const slugs = keys(cartItems);
-  const totalMrp = cartTotalOf(products, MRP);
-  const totalOfferPrice = cartTotalOf(products, OFFER_PRICE);
+  const totalMrp = useCartTotalOf(products, MRP);
+  const totalOfferPrice = useCartTotalOf(products, OFFER_PRICE);
   const fetchCartProducts = async () => {
     try {
       const responses = await Promise.all(
